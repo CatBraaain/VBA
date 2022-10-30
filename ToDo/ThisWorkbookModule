@@ -13,11 +13,14 @@ Sub SetShortcutKey()
     Application.OnKey "^h", "HideSelectedRows"
     Application.OnKey "^+h", "UnHideSelectedRows"
 
-    Application.OnKey "^d", "DeleteSelectedRows"
+    Application.OnKey "^d", "ClearSelectedCells"
+    Application.OnKey "^+d", "DeleteSelectedRows"
+    
+    
     Application.OnKey "^x", "CutSelectedRows"
     Application.OnKey "^e", "InsertSelectedRows"
     
-    Application.OnKey "^t", "SetToday"
+    Application.OnKey "^q", "SetToday"
     
     Application.OnKey "^{Tab}", "NextSheet"
     Application.OnKey "^+{Tab}", "PreviousSheet"
@@ -34,17 +37,19 @@ Sub SetFormatCondition()
     ThisWorkbook.ActiveSheet.Cells.FormatConditions.Delete
     With ThisWorkbook.ActiveSheet.Range("D:D")
         .FormatConditions.Add Type:=xlExpression, Formula1:="=AND($C1<>"""",$C1<=TODAY(),$D1="""")"
-        .FormatConditions(1).Interior.Color = rgbOrange
-        .FormatConditions(1).StopIfTrue = False
+        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbOrange
+        .FormatConditions(.FormatConditions.Count).StopIfTrue = False
     End With
-    With ThisWorkbook.ActiveSheet.Range("C:D")
-        .FormatConditions.Add Type:=xlExpression, Formula1:="=LEFT($B1,1)=""■"""
-        .FormatConditions(2).Interior.Color = rgbLightGray
-        .FormatConditions(2).StopIfTrue = False
-    End With
+'    With ThisWorkbook.ActiveSheet.Range("C:D")
+'        .FormatConditions.Add Type:=xlExpression, Formula1:="=LEFT($B1,1)=""■"""
+'        .FormatConditions(2).Interior.Color = rgbLightGray
+'        .FormatConditions(2).StopIfTrue = False
+'    End With
     With ThisWorkbook.ActiveSheet.Range("B3:D2000")
-        .FormatConditions.Add Type:=xlExpression, Formula1:="=$D3<>"""""
-        .FormatConditions(3).Interior.Color = rgbLightGray
-        .FormatConditions(3).StopIfTrue = False
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=AND(LEFT($B3,1)<>""■"",$D3<>"""")"
+        '.FormatConditions(.FormatConditions.Count).Interior.Color = rgbIvory
+        '.FormatConditions(.FormatConditions.Count).Interior.Color = rgbFloralWhite
+        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbFloralWhite
+        .FormatConditions(.FormatConditions.Count).StopIfTrue = False
     End With
 End Sub
