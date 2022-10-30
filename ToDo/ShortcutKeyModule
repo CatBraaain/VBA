@@ -1,140 +1,55 @@
-Sub InsertRowAbove()
+Private Sub Workbook_Open()
 
-    ActiveCell.EntireRow.Insert
-
+    Call SetShortcutKey
+    Call SetFormatCondition
+     
 End Sub
 
-Sub InsertRowBelow()
+Sub SetShortcutKey()
 
-    ActiveCell.Offset(1).EntireRow.Insert
+    Application.OnKey "^r", "InsertRowAbove"
+    Application.OnKey "^+r", "InsertRowBelow"
 
-End Sub
+    Application.OnKey "^h", "HideSelectedRows"
+    Application.OnKey "^+h", "UnHideSelectedRows"
 
-Sub HideSelectedRows()
-
-    If TypeName(Selection) <> "Range" Then Exit Sub
+    Application.OnKey "^d", "ClearSelectedCells"
+    Application.OnKey "^+d", "DeleteSelectedRows"
     
-    If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Hidden = True
-    Else
-        Selection.EntireColumn.Hidden = True
-    End If
-
-End Sub
-
-Sub UnHideSelectedRows()
-
-    If TypeName(Selection) <> "Range" Then Exit Sub
     
-    If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Hidden = False
-    Else
-        Selection.EntireColumn.Hidden = False
-    End If
+    Application.OnKey "^x", "CutSelectedRows"
+    Application.OnKey "^e", "InsertSelectedRows"
     
-End Sub
-
-Sub DeleteSelectedRows()
-
-    If TypeName(Selection) <> "Range" Then Exit Sub
+    Application.OnKey "^q", "SetToday"
     
-    If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Delete
-    Else
-        Selection.EntireColumn.Delete
-    End If
+    Application.OnKey "^{Tab}", "NextSheet"
+    Application.OnKey "^+{Tab}", "PreviousSheet"
+
+    Application.OnKey "%1", "IndentDown"
+    Application.OnKey "%2", "IndentUp"
+
+    Application.OnKey "%3", "HideDones"
+    Application.OnKey "%4", "ShowTitles"
     
 End Sub
 
-Sub CutSelectedRows()
-
-    If TypeName(Selection) <> "Range" Then Exit Sub
-    
-    If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Cut
-    Else
-        Selection.EntireColumn.Cut
-    End If
-    
-End Sub
-
-Sub InsertSelectedRows()
-
-    If TypeName(Selection) <> "Range" Then Exit Sub
-    
-    If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Insert
-    Else
-        Selection.EntireColumn.Insert
-    End If
-    
-End Sub
-
-Sub SetToday()
-
-    If TypeName(Selection) <> "Range" Then Exit Sub
-    Selection.Value = Date
-
-End Sub
-
-
-Sub NextSheet()
-
-    ActiveSheet.Next.Activate
-    
-End Sub
-
-Sub PreviousSheet()
-
-    ActiveSheet.Previous.Activate
-    
-End Sub
-
-Sub IndentUp()
-
-    If TypeName(Selection) <> "Range" Then Exit Sub
-    'If Selection.IndentLevel <> 15 Or IsNull(Selection.IndentLevel) Then Selection.InsertIndent InsertAmount:=1
-    Selection.InsertIndent InsertAmount:=1
-    
-End Sub
-
-Sub IndentDown()
-    
-    If TypeName(Selection) <> "Range" Then Exit Sub
-    'If Selection.IndentLevel <> 0 Then Selection.InsertIndent InsertAmount:=-1
-    On Error GoTo OnError
-    Selection.InsertIndent InsertAmount:=-1
-    Exit Sub
-OnError:
-    Selection.IndentLevel = 0
-End Sub
-
-Sub HideDones()
-
-    Application.ScreenUpdating = False
-    Application.Calculation = xlCalculationManual
-    
-    For i = 3 To Cells(Rows.Count, "D").End(xlUp).Row
-    
-        If Cells(i, "D") <> "" Then
-            Rows(i).Hidden = True
-        End If
-        
-    Next
-    
-    Application.ScreenUpdating = True
-    Application.Calculation = xlCalculationAutomatic
-
-End Sub
-
-Sub ShowTitles()
-
-    For i = 3 To Cells(Rows.Count, "B").End(xlUp).Row
-    
-        If Left(Cells(i, "B"), 1) = "■" Then
-            Rows(i).Hidden = False
-        End If
-    
-    Next
-    
+Sub SetFormatCondition()
+    ThisWorkbook.ActiveSheet.Cells.FormatConditions.Delete
+    With ThisWorkbook.ActiveSheet.Range("D:D")
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=AND($C1<>"""",$C1<=TODAY(),$D1="""")"
+        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbOrange
+        .FormatConditions(.FormatConditions.Count).StopIfTrue = False
+    End With
+'    With ThisWorkbook.ActiveSheet.Range("C:D")
+'        .FormatConditions.Add Type:=xlExpression, Formula1:="=LEFT($B1,1)=""■"""
+'        .FormatConditions(2).Interior.Color = rgbLightGray
+'        .FormatConditions(2).StopIfTrue = False
+'    End With
+    With ThisWorkbook.ActiveSheet.Range("B3:D2000")
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=AND(LEFT($B3,1)<>""■"",$D3<>"""")"
+        '.FormatConditions(.FormatConditions.Count).Interior.Color = rgbIvory
+        '.FormatConditions(.FormatConditions.Count).Interior.Color = rgbFloralWhite
+        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbFloralWhite
+        .FormatConditions(.FormatConditions.Count).StopIfTrue = False
+    End With
 End Sub
