@@ -1,0 +1,50 @@
+Private Sub Workbook_Open()
+
+    Call SetShortcutKey
+    Call SetFormatCondition
+     
+End Sub
+
+Sub SetShortcutKey()
+
+    Application.OnKey "^r", "InsertRowAbove"
+    Application.OnKey "^+r", "InsertRowBelow"
+
+    Application.OnKey "^h", "HideSelectedRows"
+    Application.OnKey "^+h", "UnHideSelectedRows"
+
+    Application.OnKey "^d", "DeleteSelectedRows"
+    Application.OnKey "^x", "CutSelectedRows"
+    Application.OnKey "^e", "InsertSelectedRows"
+    
+    Application.OnKey "^t", "SetToday"
+    
+    Application.OnKey "^{Tab}", "NextSheet"
+    Application.OnKey "^+{Tab}", "PreviousSheet"
+
+    Application.OnKey "%1", "IndentDown"
+    Application.OnKey "%2", "IndentUp"
+
+    Application.OnKey "%3", "HideDones"
+    Application.OnKey "%4", "ShowTitles"
+    
+End Sub
+
+Sub SetFormatCondition()
+    ThisWorkbook.ActiveSheet.Cells.FormatConditions.Delete
+    With ThisWorkbook.ActiveSheet.Range("D:D")
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=AND($C1<>"""",$C1<=TODAY(),$D1="""")"
+        .FormatConditions(1).Interior.Color = rgbOrange
+        .FormatConditions(1).StopIfTrue = False
+    End With
+    With ThisWorkbook.ActiveSheet.Range("C:D")
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=LEFT($B1,1)=""■"""
+        .FormatConditions(2).Interior.Color = rgbLightGray
+        .FormatConditions(2).StopIfTrue = False
+    End With
+    With ThisWorkbook.ActiveSheet.Range("B3:D2000")
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=$D3<>"""""
+        .FormatConditions(3).Interior.Color = rgbLightGray
+        .FormatConditions(3).StopIfTrue = False
+    End With
+End Sub
