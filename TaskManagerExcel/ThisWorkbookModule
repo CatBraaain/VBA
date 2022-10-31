@@ -35,21 +35,24 @@ End Sub
 
 Sub SetFormatCondition()
     ThisWorkbook.ActiveSheet.Cells.FormatConditions.Delete
-    With ThisWorkbook.ActiveSheet.Range("D:D")
+    With ThisWorkbook.ActiveSheet.Range("C:C")
         .FormatConditions.Add Type:=xlExpression, Formula1:="=AND($C1<>"""",$C1<=TODAY(),$D1="""")"
-        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbOrange
+        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbYellow
         .FormatConditions(.FormatConditions.Count).StopIfTrue = False
     End With
-'    With ThisWorkbook.ActiveSheet.Range("C:D")
-'        .FormatConditions.Add Type:=xlExpression, Formula1:="=LEFT($B1,1)=""■"""
-'        .FormatConditions(2).Interior.Color = rgbLightGray
-'        .FormatConditions(2).StopIfTrue = False
-'    End With
-    With ThisWorkbook.ActiveSheet.Range("B3:D2000")
-        .FormatConditions.Add Type:=xlExpression, Formula1:="=AND(LEFT($B3,1)<>""■"",$D3<>"""")"
-        '.FormatConditions(.FormatConditions.Count).Interior.Color = rgbIvory
-        '.FormatConditions(.FormatConditions.Count).Interior.Color = rgbFloralWhite
-        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbFloralWhite
+    With ThisWorkbook.ActiveSheet.Range("C:D")
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=OR(LEFT($B1,1)=""■"",LEFT($B1,1)=""・"")"
+        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbGainsboro
+        .FormatConditions(.FormatConditions.Count).StopIfTrue = False
+    End With
+    With ThisWorkbook.ActiveSheet.Range("C:D")
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=AND($D1<>"""",$D1<>""完了日"")"
+        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbGainsboro
+        .FormatConditions(.FormatConditions.Count).StopIfTrue = False
+    End With
+    With ThisWorkbook.ActiveSheet.Range("B:B")
+        .FormatConditions.Add Type:=xlExpression, Formula1:="=AND($D1<>"""",$D1<>""完了日"")"
+        .FormatConditions(.FormatConditions.Count).Interior.Color = rgbWhiteSmoke
         .FormatConditions(.FormatConditions.Count).StopIfTrue = False
     End With
 End Sub
