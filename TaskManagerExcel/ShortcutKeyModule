@@ -1,3 +1,5 @@
+
+
 Sub InsertRowAbove()
 
     ActiveCell.EntireRow.Insert
@@ -84,6 +86,17 @@ Sub SetToday()
 
 End Sub
 
+Sub ToggleReadOnly()
+    
+    With ActiveWorkbook
+        If .ReadOnly Then
+            .ChangeFileAccess Mode:=xlReadWrite
+        Else
+            .ChangeFileAccess Mode:=xlReadOnly
+        End If
+    End With
+    
+End Sub
 
 Sub NextSheet()
 
@@ -121,6 +134,7 @@ Sub IndentDown()
     Exit Sub
 OnError:
     Selection.IndentLevel = 0
+    
 End Sub
 
 Sub HideDones()
@@ -157,10 +171,4 @@ Sub ShowTitles()
     Application.ScreenUpdating = True
     Application.Calculation = xlCalculationAutomatic
     
-End Sub
-
-Sub test()
-
-MsgBox 11
-
 End Sub
