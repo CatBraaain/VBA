@@ -21,6 +21,7 @@ Sub SetShortcutKey()
     Application.OnKey "^e", "InsertSelectedRows"
     
     Application.OnKey "^q", "SetToday"
+    Application.OnKey "^o", "ToggleReadOnly"
     
     Application.OnKey "^{Tab}", "NextSheet"
     Application.OnKey "^+{Tab}", "PreviousSheet"
