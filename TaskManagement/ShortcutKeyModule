@@ -120,20 +120,19 @@ End Sub
 Sub IndentUp()
 
     If TypeName(Selection) <> "Range" Then Exit Sub
-    'If Selection.IndentLevel <> 15 Or IsNull(Selection.IndentLevel) Then Selection.InsertIndent InsertAmount:=1
-    Selection.InsertIndent InsertAmount:=1
+    Selection.InsertIndent insertamount:=1
     
 End Sub
 
 Sub IndentDown()
     
     If TypeName(Selection) <> "Range" Then Exit Sub
-    'If Selection.IndentLevel <> 0 Then Selection.InsertIndent InsertAmount:=-1
-    On Error GoTo OnError
-    Selection.InsertIndent InsertAmount:=-1
-    Exit Sub
-OnError:
-    Selection.IndentLevel = 0
+    
+    For Each c In Selection
+        If c.IndentLevel <> 0 Then
+            c.InsertIndent insertamount:=1
+        End If
+    Next
     
 End Sub
 
