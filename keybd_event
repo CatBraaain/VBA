@@ -1,0 +1,12 @@
+Private Declare PtrSafe Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Integer, ByVal dwExtraInfo As Integer)
+Private Declare PtrSafe Function MapVirtualKey Lib "user32" Alias "MapVirtualKeyA" (ByVal wCode As Integer, ByVal wMapType As Integer) As Integer
+    
+Private Declare PtrSafe Function SystemParametersInfo Lib "user32" Alias "SystemParametersInfoA" (ByVal uAction As Integer, ByVal uParam As Integer, ByRef lpvParam As Integer, ByVal fuWinIni As Integer) As Integer
+
+Sub CtrlA()
+    keybd_event vbKeyControl, MapVirtualKey(vbKeyControl, 0), 0, 0
+    keybd_event vbKeyA, MapVirtualKey(vbKeyA, 0), 0, 0
+    keybd_event vbKeyA, MapVirtualKey(vbKeyA, 0), 2, 0
+    keybd_event vbKeyControl, MapVirtualKey(vbKeyControl, 0), 2, 0
+    'keybd_event(vbKeyA, MapVirtualKey(vbKeyA, 0), 2, 0)
+End Sub
