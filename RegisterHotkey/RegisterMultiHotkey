@@ -1,0 +1,79 @@
+Private Declare PtrSafe Function CallWindowProc Lib "user32" Alias "CallWindowProcA" (ByVal lpPrevWndFunc As Long, ByVal hWnd As Long, ByVal Msg As Long, ByVal wParam As Long, ByVal lParam As LongPtr) As Long
+Private Declare PtrSafe Function GlobalAddAtom Lib "kernel32" Alias "GlobalAddAtomA" (ByVal lpString As String) As Integer
+Private Declare PtrSafe Function GlobalDeleteAtom Lib "kernel32" (ByVal nAtom As Integer) As Integer
+Private Declare PtrSafe Function RegisterHotKey Lib "user32" (ByVal hWnd As Long, ByVal id As Long, ByVal fsModifiers As Long, ByVal vk As Long) As Long
+Private Declare PtrSafe Function SetWindowLongPtr Lib "user32" Alias "SetWindowLongPtrA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As LongPtr) As Long
+Private Declare PtrSafe Function UnregisterHotKey Lib "user32" (ByVal hWnd As Long, ByVal id As Long) As Long
+ 
+Private Const GWL_WNDPROC = (-4)
+Private Const WM_HOTKEY = &H312
+
+Private Const MOD_ALT = &H1
+Private Const MOD_CONTROL = &H2
+Private Const MOD_SHIFT = &H4
+Private Const MOD_WIN = &H8
+Private Const MOD_NOREPEAT = &H4000
+
+Dim hWndProc As Long
+Dim mDict As Object
+
+Sub Macro1()
+    Debug.Print 1
+End Sub
+
+Sub StartHook()
+    If hWndProc <> 0 Then Exit Sub
+    
+    Set mDict = CreateObject("Scripting.Dictionary")
+    
+    AddDict MOD_CONTROL, vbKeyR, "Macro1"
+    
+    Call SetAllHotKey
+    
+    hWndProc = SetWindowLongPtr(Application.hWnd, GWL_WNDPROC, AddressOf WndProc)
+End Sub
+
+Function AddDict(mk, vk, mname)
+    Dim m As HotKeyInfo: Set m = New HotKeyInfo
+    m.mk = mk
+    m.vk = vk
+    m.mname = mname
+    m.atom = GlobalAddAtom("HOTKEY" & Str(mDict.Count + 1))
+    
+    mDict.Add m.atom, m
+End Function
+
+Function SetAllHotKey()
+    For Each key In mDict
+        Set m = mDict(key)
+        RegisterHotKey Application.hWnd, m.atom, m.mk, m.vk
+    Next
+End Function
+
+Private Function WndProc(ByVal hWnd As Long, ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As LongPtr) As Long
+
+    If uMsg = WM_HOTKEY Then
+        If mDict.exists(wParam) Then
+            Application.Run "ShortcutKey." & mDict(wParam).mname
+            'Application.Run "Module1.Macro1"
+            'Debug.Print "Module1." & mDict(wParam).mname
+        End If
+    End If
+    WndProc = CallWindowProc(hWndProc, hWnd, uMsg, wParam, lParam)
+
+End Function
+
+Sub EndHook()
+    If hWndProc = 0 Then Exit Sub
+
+    SetWindowLongPtr Application.hWnd, GWL_WNDPROC, hWndProc
+
+    For Each key In mDict
+        UnregisterHotKey Application.hWnd, mDict(key).atom
+        GlobalDeleteAtom mDict(key).atom
+    Next
+
+    hWndProc = 0
+End Sub
+
+
