@@ -1,0 +1,157 @@
+Dim vkdict As Object
+Dim mkdict As Object
+
+Sub AddHotKey(hk, mname)
+    Application.OnKey hk, "'CmnOnkey """ & hk & """, """ & mname & """'"
+End Sub
+
+Sub CmnOnkey(hk, mname)
+    
+    makeKeyEvent hk, 2
+    Application.Run mname
+    makeKeyEvent hk, 3
+
+End Sub
+
+Function makeKeyEvent(ByVal vkArr, Optional dwFlags As Integer = 1)
+    
+    If IsArray(vkArr) Then
+        If UBound(vkArr) = 1 Then
+            Exit Function
+        End If
+        
+        For i = 1 To UBound(vkArr) - 1
+            vkArr(i) = vkArr(i + 1)
+        Next i
+        ReDim Preserve vkArr(UBound(vkArr) - 1)
+    Else
+        kc = vkArr
+        vkArr = kc2vkArr(kc)
+    End If
+    
+    vk = vkArr(1)
+    
+    If dwFlags = 0 Or dwFlags = 1 Then keybd_event vk, MapVirtualKey(vk, 0), 0, 0
+    
+    makeKeyEvent vkArr, dwFlags
+    
+    If dwFlags = 2 Or dwFlags = 1 Then keybd_event vk, MapVirtualKey(vk, 0), 2, 0
+    
+    If dwFlags = 3 And (vk = vbKeyShift Or vk = vbKeyControl Or vk = vbKeyMenu) Then keybd_event vk, MapVirtualKey(vk, 0), 0, 0
+    
+End Function
+
+Function kc2vkArr(kc)
+
+    Dim kcArr() As String: ReDim kcArr(0)
+    
+    For i = 1 To Len(kc)
+        ReDim Preserve kcArr(UBound(kcArr) + 1)
+        If Mid(kc, i, 1) <> "{" Then
+            kcArr(i) = Mid(kc, i, 1)
+        Else
+            kcArr(i) = Mid(kc, i, InStr(i, kc, "}"))
+            i = InStr(i, kc, "}")
+        End If
+    Next
+    
+    Call setkcdict
+    
+    Dim vkArr() As String: ReDim vkArr(UBound(kcArr))
+    For i = 1 To UBound(kcArr)
+        vkArr(i) = vkdict(kcArr(i))
+    Next
+    
+    kc2vkArr = vkArr()
+    
+End Function
+
+Sub setkcdict()
+
+    Set mkdict = CreateObject("Scripting.Dictionary")
+    mkdict.Add "+", vbKeyShift
+    mkdict.Add "^", vbKeyControl
+    mkdict.Add "%", vbKeyMenu
+
+    Set vkdict = CreateObject("Scripting.Dictionary")
+    vkdict.Add "{OemSemicolon}", 186
+    vkdict.Add "{*}", vbKeyMultiply
+    vkdict.Add "{+}", vbKeyAdd
+    vkdict.Add "{-}", vbKeySubtract
+    vkdict.Add "{.}", vbKeyDecimal
+    vkdict.Add "{/}", vbKeyDivide
+    vkdict.Add "{SPACE}", vbKeySpace
+    vkdict.Add "+", vbKeyShift
+    vkdict.Add "^", vbKeyControl
+    vkdict.Add "%", vbKeyMenu
+    vkdict.Add "{BACKSPACE}", vbKeyBack
+    vkdict.Add "{CAPSLOCK}", vbKeyCapital
+    vkdict.Add "{CLEAR}", vbKeyClear
+    vkdict.Add "{DELETE}", vbKeyDelete
+    vkdict.Add "{DOWN}", vbKeyDown
+    vkdict.Add "{END}", vbKeyEnd
+    vkdict.Add "{ENTER}", vbKeyReturn
+    vkdict.Add "{ESC}", vbKeyEscape
+    vkdict.Add "{HELP}", vbKeyHelp
+    vkdict.Add "{HOME}", vbKeyHome
+    vkdict.Add "{INSERT}", vbKeyInsert
+    vkdict.Add "{LEFT}", vbKeyLeft
+    vkdict.Add "{NUMLOCK}", vbKeyNumlock
+    vkdict.Add "{PGDN}", vbKeyPageDown
+    vkdict.Add "{PGUP}", vbKeyPageUp
+    vkdict.Add "{RIGHT}", vbKeyRight
+    vkdict.Add "{TAB}", vbKeyTab
+    vkdict.Add "{UP}", vbKeyUp
+    vkdict.Add "{F1}", vbKeyF1
+    vkdict.Add "{F2}", vbKeyF2
+    vkdict.Add "{F3}", vbKeyF3
+    vkdict.Add "{F4}", vbKeyF4
+    vkdict.Add "{F5}", vbKeyF5
+    vkdict.Add "{F6}", vbKeyF6
+    vkdict.Add "{F7}", vbKeyF7
+    vkdict.Add "{F8}", vbKeyF8
+    vkdict.Add "{F9}", vbKeyF9
+    vkdict.Add "{F10}", vbKeyF10
+    vkdict.Add "{F11}", vbKeyF11
+    vkdict.Add "{F12}", vbKeyF12
+    vkdict.Add "{F13}", vbKeyF13
+    vkdict.Add "{F14}", vbKeyF14
+    vkdict.Add "{F15}", vbKeyF15
+    vkdict.Add "{F16}", vbKeyF16
+    vkdict.Add "0", vbKey0
+    vkdict.Add "1", vbKey1
+    vkdict.Add "2", vbKey2
+    vkdict.Add "3", vbKey3
+    vkdict.Add "4", vbKey4
+    vkdict.Add "5", vbKey5
+    vkdict.Add "6", vbKey6
+    vkdict.Add "7", vbKey7
+    vkdict.Add "8", vbKey8
+    vkdict.Add "9", vbKey9
+    vkdict.Add "a", vbKeyA
+    vkdict.Add "b", vbKeyB
+    vkdict.Add "c", vbKeyC
+    vkdict.Add "d", vbKeyD
+    vkdict.Add "e", vbKeyE
+    vkdict.Add "f", vbKeyF
+    vkdict.Add "g", vbKeyG
+    vkdict.Add "h", vbKeyH
+    vkdict.Add "i", vbKeyI
+    vkdict.Add "j", vbKeyJ
+    vkdict.Add "k", vbKeyK
+    vkdict.Add "l", vbKeyL
+    vkdict.Add "m", vbKeyM
+    vkdict.Add "n", vbKeyN
+    vkdict.Add "o", vbKeyO
+    vkdict.Add "p", vbKeyP
+    vkdict.Add "q", vbKeyQ
+    vkdict.Add "r", vbKeyR
+    vkdict.Add "s", vbKeyS
+    vkdict.Add "t", vbKeyT
+    vkdict.Add "u", vbKeyU
+    vkdict.Add "v", vbKeyV
+    vkdict.Add "w", vbKeyW
+    vkdict.Add "x", vbKeyX
+    vkdict.Add "y", vbKeyY
+    vkdict.Add "z", vbKeyZ
+End Sub
