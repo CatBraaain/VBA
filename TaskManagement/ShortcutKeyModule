@@ -143,7 +143,7 @@ Sub HideDones()
     
     For i = 3 To Cells(Rows.Count, "D").End(xlUp).Row
     
-        If Cells(i, "D") <> "" Then
+        If Cells(i, "D") <> "" And Cells(i, "D") <> "固定" Then
             Rows(i).Hidden = True
         End If
         
