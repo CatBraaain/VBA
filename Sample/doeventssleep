@@ -1,0 +1,6 @@
+Function Sleep(ms)
+    eot = [Now()] + ms / 86400
+    While [Now()] < eot
+        DoEvents
+    Wend
+End Function
