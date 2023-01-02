@@ -1,76 +1,23 @@
-Declare PtrSafe Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Integer, ByVal dwExtraInfo As Integer)
-Declare PtrSafe Function MapVirtualKey Lib "user32" Alias "MapVirtualKeyA" (ByVal wCode As Integer, ByVal wMapType As Integer) As Integer
-Dim rng As Range
-
 Sub InsertRowAbove()
 
-    Application.ScreenUpdating = False 'Entire.Selectでスクロールが1行1列目になってしまうのを防ぐため
-    Set rng = ActiveCell
-    If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Select
-        makeKeyEvent "{ESC}"
-        makeKeyEvent "^{+}"
-        rng.Activate
-    Else
-        Selection.EntireColumn.Select
-        makeKeyEvent "{ESC}"
-        makeKeyEvent "^{+}"
-        rng.Activate
-    End If
-    Application.ScreenUpdating = True
+    ActiveCell.EntireRow.Insert
 
-    'Application.OnTime [Now()+0.01/86400], "InsertRowAbove2"
-    
 End Sub
-'Sub InsertRowAbove2()
-'
-'    Set rng = ActiveCell
-'    Selection.Offset(Selection.Rows.Count).Select
-'    rng.Offset(Selection.Rows.Count).Activate
-'
-'End Sub
 
 Sub InsertRowBelow()
 
-    Application.ScreenUpdating = False 'Entire.Selectでスクロールが1行1列目になってしまうのを防ぐため
-    Set rng = ActiveCell
-    If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.Offset(Selection.Rows.Count).EntireRow.Select
-        makeKeyEvent "{ESC}"
-        makeKeyEvent "^{+}"
-        rng.Offset(Selection.Rows.Count).Activate
-    Else
-        Selection.Offset(0, Selection.Columns.Count).EntireColumn.Select
-        makeKeyEvent "{ESC}"
-        makeKeyEvent "^{+}"
-        rng.Offset(0, Selection.Columns.Count).Activate
-    End If
-    Application.ScreenUpdating = True
-    
-    'Application.OnTime [Now()+0.01/86400], "InsertRowBelow2"
-    
+    ActiveCell.Offset(1).EntireRow.Insert
+
 End Sub
-'Sub InsertRowBelow2()
-'
-'    Set rng = ActiveCell
-'    If Selection.Address <> Selection.EntireColumn.Address Then
-'        Selection.Offset(Selection.Rows.Count * -1).Select
-'        rng.Offset(Selection.Rows.Count * -1).Activate
-'    Else
-'        Selection.Offset(0, Selection.Columns.Count * -1).Select
-'        rng.Offset(0, Selection.Columns.Count * -1).Activate
-'    End If
-'
-'End Sub
 
 Sub HideSelectedRows()
 
     If TypeName(Selection) <> "Range" Then Exit Sub
     
     If Selection.Address <> Selection.EntireColumn.Address Then
-        makeKeyEvent "^9"
+        Selection.EntireRow.Hidden = True
     Else
-        makeKeyEvent "^0"
+        Selection.EntireColumn.Hidden = True
     End If
 
 End Sub
@@ -80,10 +27,9 @@ Sub UnHideSelectedRows()
     If TypeName(Selection) <> "Range" Then Exit Sub
     
     If Selection.Address <> Selection.EntireColumn.Address Then
-        makeKeyEvent "^+9"
+        Selection.EntireRow.Hidden = False
     Else
-        'makeKeyEvent "^+0"
-        Selection.EntireColumn.Hidden = False 'Ctrl Shift 0 が効かないバグ回避のため
+        Selection.EntireColumn.Hidden = False
     End If
     
 End Sub
@@ -113,10 +59,9 @@ Sub CopySelectedRows()
     If TypeName(Selection) <> "Range" Then Exit Sub
     
     If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Select
-        makeKeyEvent "^c"
+        Selection.EntireRow.Copy
     Else
-        makeKeyEvent "^c"
+        Selection.EntireColumn.Copy
     End If
     
 End Sub
@@ -126,20 +71,26 @@ Sub CutSelectedRows()
     If TypeName(Selection) <> "Range" Then Exit Sub
     
     If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Select
-        makeKeyEvent "^x"
+        Selection.EntireRow.Cut
     Else
-        makeKeyEvent "^x"
+        Selection.EntireColumn.Cut
     End If
+    
+End Sub
+
+Sub InsertSelectedRows()
+
+    If TypeName(Selection) <> "Range" Then Exit Sub
+    
+    makeKeyEvent "^{OemSemicolon}"
+    makeKeyEvent "^{ENTER}"
     
 End Sub
 
 Sub SetToday()
 
     If TypeName(Selection) <> "Range" Then Exit Sub
-    
-    makeKeyEvent "^{OemSemicolon}"
-    makeKeyEvent "^{ENTER}"
+    Selection.Value = Date
 
 End Sub
 
@@ -177,7 +128,7 @@ End Sub
 Sub IndentUp()
 
     If TypeName(Selection) <> "Range" Then Exit Sub
-    Selection.InsertIndent insertamount:=1 'Alt+H+6 は遅すぎて使い物にならないため
+    Selection.InsertIndent insertamount:=1
     
 End Sub
 
@@ -229,68 +180,3 @@ Sub ShowTitles()
     
 End Sub
 
-'Sub HideDones() 'Application.OnTimeを呼ぶところで画面更新がかかってしまう
-'
-'    Application.ScreenUpdating = False
-'    Application.Calculation = xlCalculationManual
-'    Set rng = ActiveCell
-'    Set rng2 = Nothing
-'    For i = Cells(Rows.Count, "D").End(xlUp).Row To 3 Step -3
-'
-'        If Cells(i, "D") <> "" And Cells(i, "D") <> "固定" Then
-'            'Rows(i).Hidden = True
-'            If Not (rng2 Is Nothing) Then
-'                Set rng2 = Union(rng2, Rows(i))
-'            Else
-'                Set rng2 = Rows(i)
-'            End If
-'        End If
-'
-'    Next
-'    rng2.Select
-'    makeKeyEvent "^9"
-'
-'    Application.OnTime [Now()+0.01/86400], "'HideDones2 """ & rng.Address & """'"
-'End Sub
-'
-'Sub HideDones2(rngaddress)
-'
-'    Range(rngaddress).Select
-'    Application.Calculation = xlCalculationAutomatic
-'    Application.ScreenUpdating = True
-'
-'End Sub
-'
-'Sub ShowTitles()
-'
-'    Application.ScreenUpdating = False
-'    Application.Calculation = xlCalculationManual
-'    Set rng = ActiveCell
-'    Set rng2 = Nothing
-'    For i = Cells(Rows.Count, "B").End(xlUp).Row To 3 Step -1
-'
-'
-'        If Left(Cells(i, "B"), 1) = "■" Then
-'            'Rows(i).Hidden = False
-'            If Not (rng2 Is Nothing) Then
-'                Set rng2 = Union(rng2, Rows(i))
-'            Else
-'                Set rng2 = Rows(i)
-'            End If
-'        End If
-'
-'    Next
-'    rng2.Select
-'    makeKeyEvent "^+9"
-'
-'    Application.OnTime [Now()+0.01/86400], "'ShowTitles2 """ & rng.Address & """'"
-'
-'End Sub
-'
-'Sub ShowTitles2(rngaddress)
-'
-'    Range(rngaddress).Select
-'    Application.Calculation = xlCalculationAutomatic
-'    Application.ScreenUpdating = True
-'
-'End Sub
