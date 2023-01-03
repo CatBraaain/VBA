@@ -3,6 +3,13 @@ Declare PtrSafe Function MapVirtualKey Lib "user32" Alias "MapVirtualKeyA" (ByVa
 Dim vkdict As Object
 Dim mkdict As Object
 
+'Sub test()
+'
+'    AddHotKey "^d", "ClearSelectedCells"
+'    makeKeyEvent "^{-}"
+'
+'End Sub
+
 Sub AddHotKey(hk, mname)
     Application.OnKey hk, "'CmnOnkey """ & hk & """, """ & mname & """'"
 End Sub
@@ -17,7 +24,10 @@ End Sub
 
 Function makeKeyEvent(ByVal vkArr, Optional dwFlags As Integer = 1)
     
-    If IsArray(vkArr) Then
+    If Not IsArray(vkArr) Then
+        kc = vkArr
+        vkArr = kc2vkArr(kc)
+    Else
         If UBound(vkArr) = 1 Then
             Exit Function
         End If
@@ -26,9 +36,6 @@ Function makeKeyEvent(ByVal vkArr, Optional dwFlags As Integer = 1)
             vkArr(i) = vkArr(i + 1)
         Next i
         ReDim Preserve vkArr(UBound(vkArr) - 1)
-    Else
-        kc = vkArr
-        vkArr = kc2vkArr(kc)
     End If
     
     vk = vkArr(1)
