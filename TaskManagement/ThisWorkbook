@@ -1,38 +1,38 @@
 Private Sub Workbook_Open()
-
     Call SetShortcutKey
     Call SetFormatCondition
-     
 End Sub
 
 Sub SetShortcutKey()
-
-    Application.OnKey "^r", "InsertRowAbove"
-    Application.OnKey "^+r", "InsertRowBelow"
-
-    Application.OnKey "^h", "HideSelectedRows"
-    Application.OnKey "^+h", "UnHideSelectedRows"
-
-    Application.OnKey "^d", "ClearSelectedCells"
-    Application.OnKey "^+d", "DeleteSelectedRows"
     
-    
-    Application.OnKey "^x", "CutSelectedRows"
-    Application.OnKey "^e", "InsertSelectedRows"
-    
-    Application.OnKey "^q", "SetToday"
-    Application.OnKey "^+q", "HideSelectedRows"
-    
-    Application.OnKey "^o", "ToggleReadOnly"
-    
-    Application.OnKey "^{Tab}", "NextSheet"
-    Application.OnKey "^+{Tab}", "PreviousSheet"
+    AddHotKey "^r", "InsertRowsAbove"
+    AddHotKey "^+r", "InsertRowsBelow"
 
-    Application.OnKey "%1", "IndentDown"
-    Application.OnKey "%2", "IndentUp"
+    AddHotKey "^h", "HideSelectedRows"
+    AddHotKey "^+h", "UnHideSelectedRows"
 
-    Application.OnKey "%3", "HideDones"
-    Application.OnKey "%4", "ShowTitles"
+    AddHotKey "^d", "ClearSelectedCells"
+    AddHotKey "^+d", "DeleteSelectedRows"
+
+    AddHotKey "^+c", "CopySelectedRows"
+    AddHotKey "^+x", "CutSelectedRows"
+    
+    AddHotKey "^e", "InsertSelectedRowsAbove"
+    AddHotKey "^+e", "InsertSelectedRowsBelow"
+
+    AddHotKey "^q", "SetToday"
+    AddHotKey "^+q", "HideSelectedRows"
+
+    AddHotKey "^o", "ToggleReadOnly"
+
+    AddHotKey "^{TAB}", "NextSheet"
+    AddHotKey "^+{TAB}", "PreviousSheet"
+
+    AddHotKey "%1", "IndentDown"
+    AddHotKey "%2", "IndentUp"
+
+    AddHotKey "%3", "HideDones"
+    AddHotKey "%4", "ShowTitles"
     
 End Sub
 
