@@ -1,13 +1,40 @@
-Sub InsertRowAbove()
 
-    ActiveCell.EntireRow.Insert
+Sub InsertRowsAbove()
 
+    Application.ScreenUpdating = False 'Entire.Selectでスクロールが1行1列目になってしまうのを防ぐため
+    Set rng = ActiveCell
+    If Selection.Address <> Selection.EntireColumn.Address Then
+        Selection.EntireRow.Select
+        makeKeyEvent "{ESC}"
+        makeKeyEvent "^{+}"
+        rng.Activate
+    Else
+        Selection.EntireColumn.Select
+        makeKeyEvent "{ESC}"
+        makeKeyEvent "^{+}"
+        rng.Activate
+    End If
+    Application.ScreenUpdating = True
+    
 End Sub
 
-Sub InsertRowBelow()
+Sub InsertRowsBelow()
 
-    ActiveCell.Offset(1).EntireRow.Insert
-
+    Application.ScreenUpdating = False 'Entire.Selectでスクロールが1行1列目になってしまうのを防ぐため
+    Set rng = ActiveCell
+    If Selection.Address <> Selection.EntireColumn.Address Then
+        Selection.Offset(Selection.Rows.Count).EntireRow.Select
+        makeKeyEvent "{ESC}"
+        makeKeyEvent "^{+}"
+        rng.Offset(Selection.Rows.Count).Activate
+    Else
+        Selection.Offset(0, Selection.Columns.Count).EntireColumn.Select
+        makeKeyEvent "{ESC}"
+        makeKeyEvent "^{+}"
+        rng.Offset(0, Selection.Columns.Count).Activate
+    End If
+    Application.ScreenUpdating = True
+    
 End Sub
 
 Sub HideSelectedRows()
@@ -15,9 +42,9 @@ Sub HideSelectedRows()
     If TypeName(Selection) <> "Range" Then Exit Sub
     
     If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Hidden = True
+        makeKeyEvent "^9"
     Else
-        Selection.EntireColumn.Hidden = True
+        makeKeyEvent "^0"
     End If
 
 End Sub
@@ -27,9 +54,10 @@ Sub UnHideSelectedRows()
     If TypeName(Selection) <> "Range" Then Exit Sub
     
     If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Hidden = False
+        makeKeyEvent "^+9"
     Else
-        Selection.EntireColumn.Hidden = False
+        'makeKeyEvent "^+0"
+        Selection.EntireColumn.Hidden = False 'Ctrl Shift 0 が効かないバグ回避のため
     End If
     
 End Sub
@@ -78,19 +106,50 @@ Sub CutSelectedRows()
     
 End Sub
 
-Sub InsertSelectedRows()
+Sub InsertSelectedRowsAbove()
 
-    If TypeName(Selection) <> "Range" Then Exit Sub
+    Application.ScreenUpdating = False 'Entire.Selectでスクロールが1行1列目になってしまうのを防ぐため
+    Set rng = ActiveCell
+    If Selection.Address <> Selection.EntireColumn.Address Then
+        Selection.Offset(Selection.Rows.Count).EntireRow.Select
+        makeKeyEvent "{ESC}"
+        makeKeyEvent "^{+}"
+        rng.Offset(Selection.Rows.Count).Activate
+    Else
+        Selection.Offset(0, Selection.Columns.Count).EntireColumn.Select
+        makeKeyEvent "{ESC}"
+        makeKeyEvent "^{+}"
+        rng.Offset(0, Selection.Columns.Count).Activate
+    End If
+    Application.ScreenUpdating = True
     
-    makeKeyEvent "^{OemSemicolon}"
-    makeKeyEvent "^{ENTER}"
+End Sub
+
+Sub InsertSelectedRowsBelow()
+
+    Application.ScreenUpdating = False 'Entire.Selectでスクロールが1行1列目になってしまうのを防ぐため
+    Set rng = ActiveCell
+    If Selection.Address <> Selection.EntireColumn.Address Then
+        Selection.Offset(Selection.Rows.Count).EntireRow.Select
+        makeKeyEvent "{ESC}"
+        makeKeyEvent "^{+}"
+        rng.Offset(Selection.Rows.Count).Activate
+    Else
+        Selection.Offset(0, Selection.Columns.Count).EntireColumn.Select
+        makeKeyEvent "{ESC}"
+        makeKeyEvent "^{+}"
+        rng.Offset(0, Selection.Columns.Count).Activate
+    End If
+    Application.ScreenUpdating = True
     
 End Sub
 
 Sub SetToday()
 
     If TypeName(Selection) <> "Range" Then Exit Sub
-    Selection.Value = Date
+    
+    makeKeyEvent "^{OemSemicolon}"
+    makeKeyEvent "^{ENTER}"
 
 End Sub
 
@@ -128,7 +187,7 @@ End Sub
 Sub IndentUp()
 
     If TypeName(Selection) <> "Range" Then Exit Sub
-    Selection.InsertIndent insertamount:=1
+    Selection.InsertIndent insertamount:=1 'Alt+H+6 は遅すぎて使い物にならないため
     
 End Sub
 
@@ -144,21 +203,35 @@ Sub IndentDown()
     
 End Sub
 
-Sub HideDones()
+Sub HideDones() 'Application.OnTimeを呼ぶところで画面更新がかかってしまう
 
     Application.ScreenUpdating = False
     Application.Calculation = xlCalculationManual
-    
-    For i = 3 To Cells(Rows.Count, "D").End(xlUp).Row
-    
+    Set rng = ActiveCell
+    Set rng2 = Nothing
+    For i = Cells(Rows.Count, "D").End(xlUp).Row To 3 Step -1
+
         If Cells(i, "D") <> "" And Cells(i, "D") <> "固定" Then
-            Rows(i).Hidden = True
+            'Rows(i).Hidden = True
+            If Not (rng2 Is Nothing) Then
+                Set rng2 = Union(rng2, Rows(i))
+            Else
+                Set rng2 = Rows(i)
+            End If
         End If
-        
+
     Next
-    
-    Application.ScreenUpdating = True
+    rng2.Select
+    makeKeyEvent "^9"
+
+    Application.OnTime [Now()+0.01/86400], "'HideDones2 """ & rng.Address & """'"
+End Sub
+
+Sub HideDones2(rngaddress)
+
+    Range(rngaddress).Select
     Application.Calculation = xlCalculationAutomatic
+    Application.ScreenUpdating = True
 
 End Sub
 
@@ -166,17 +239,33 @@ Sub ShowTitles()
 
     Application.ScreenUpdating = False
     Application.Calculation = xlCalculationManual
+    Set rng = ActiveCell
+    Set rng2 = Nothing
+    For i = Cells(Rows.Count, "B").End(xlUp).Row To 3 Step -1
 
-    For i = 3 To Cells(Rows.Count, "B").End(xlUp).Row
-    
+
         If Left(Cells(i, "B"), 1) = "■" Then
-            Rows(i).Hidden = False
+            'Rows(i).Hidden = False
+            If Not (rng2 Is Nothing) Then
+                Set rng2 = Union(rng2, Rows(i))
+            Else
+                Set rng2 = Rows(i)
+            End If
         End If
-    
+
     Next
-    
-    Application.ScreenUpdating = True
+    rng2.Select
+    makeKeyEvent "^+9"
+
+    Application.OnTime [Now()+0.01/86400], "'ShowTitles2 """ & rng.Address & """'"
+
+End Sub
+
+Sub ShowTitles2(rngaddress)
+
+    Range(rngaddress).Select
     Application.Calculation = xlCalculationAutomatic
-    
+    Application.ScreenUpdating = True
+
 End Sub
 
