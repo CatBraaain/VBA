@@ -1,3 +1,4 @@
+Dim copyrng As Range
 
 Sub InsertRowsAbove()
 
@@ -7,13 +8,21 @@ Sub InsertRowsAbove()
         Selection.EntireRow.Select
         makeKeyEvent "{ESC}"
         makeKeyEvent "^{+}"
-        rng.Activate
+        'rng.Activate
     Else
         Selection.EntireColumn.Select
         makeKeyEvent "{ESC}"
         makeKeyEvent "^{+}"
-        rng.Activate
+        'rng.Activate
     End If
+    'Application.ScreenUpdating = True
+    Application.OnTime [Now()+0.01/86400], "'InsertRowsAbove2 """ & rng.Address & """'"
+    
+End Sub
+
+Sub InsertRowsAbove2(rngaddress)
+    
+    Range(rngaddress).Select
     Application.ScreenUpdating = True
     
 End Sub
@@ -26,13 +35,21 @@ Sub InsertRowsBelow()
         Selection.Offset(Selection.Rows.Count).EntireRow.Select
         makeKeyEvent "{ESC}"
         makeKeyEvent "^{+}"
-        rng.Offset(Selection.Rows.Count).Activate
+        'rng.Offset(Selection.Rows.Count).Activate
     Else
         Selection.Offset(0, Selection.Columns.Count).EntireColumn.Select
         makeKeyEvent "{ESC}"
         makeKeyEvent "^{+}"
-        rng.Offset(0, Selection.Columns.Count).Activate
+        'rng.Offset(0, Selection.Columns.Count).Activate
     End If
+    'Application.ScreenUpdating = True
+    Application.OnTime [Now()+0.01/86400], "'InsertRowsBelow2 """ & rng.Offset(0, Selection.Columns.Count).Address & """'"
+    
+End Sub
+
+Sub InsertRowsBelow2(rngaddress)
+    
+    Range(rngaddress).Select
     Application.ScreenUpdating = True
     
 End Sub
@@ -87,15 +104,20 @@ Sub CopySelectedRows()
     If TypeName(Selection) <> "Range" Then Exit Sub
     
     If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.EntireRow.Copy
+        'Selection.EntireRow.Copy
+        Set copyrng = Selection.EntireRow
+        copyrng.Copy
     Else
-        Selection.EntireColumn.Copy
+        'Selection.EntireColumn.Copy
+        Set copyrng = Selection.EntireColumn
+        copyrng.Copy
     End If
     
 End Sub
 
 Sub CutSelectedRows()
-
+    
+    Set copyrng = Nothing
     If TypeName(Selection) <> "Range" Then Exit Sub
     
     If Selection.Address <> Selection.EntireColumn.Address Then
@@ -111,16 +133,25 @@ Sub InsertSelectedRowsAbove()
     Application.ScreenUpdating = False 'Entire.Selectでスクロールが1行1列目になってしまうのを防ぐため
     Set rng = ActiveCell
     If Selection.Address <> Selection.EntireColumn.Address Then
-        Selection.Offset(Selection.Rows.Count).EntireRow.Select
-        makeKeyEvent "{ESC}"
+        Selection.EntireRow.Select
         makeKeyEvent "^{+}"
-        rng.Offset(Selection.Rows.Count).Activate
+        rng.Activate
     Else
-        Selection.Offset(0, Selection.Columns.Count).EntireColumn.Select
-        makeKeyEvent "{ESC}"
+        Selection.EntireColumn.Select
         makeKeyEvent "^{+}"
-        rng.Offset(0, Selection.Columns.Count).Activate
+        rng.Activate
     End If
+    
+    If Not copyrng Is Nothing Then copyrng.Copy
+    
+    'Application.ScreenUpdating = True
+    Application.OnTime [Now()+0.01/86400], "'InsertSelectedRowsAbove2 """ & rng.Address & """'"
+    
+End Sub
+
+Sub InsertSelectedRowsAbove2(rngaddress)
+    
+    Range(rngaddress).Select
     Application.ScreenUpdating = True
     
 End Sub
@@ -131,15 +162,24 @@ Sub InsertSelectedRowsBelow()
     Set rng = ActiveCell
     If Selection.Address <> Selection.EntireColumn.Address Then
         Selection.Offset(Selection.Rows.Count).EntireRow.Select
-        makeKeyEvent "{ESC}"
         makeKeyEvent "^{+}"
         rng.Offset(Selection.Rows.Count).Activate
     Else
         Selection.Offset(0, Selection.Columns.Count).EntireColumn.Select
-        makeKeyEvent "{ESC}"
         makeKeyEvent "^{+}"
         rng.Offset(0, Selection.Columns.Count).Activate
     End If
+    
+    If Not copyrng Is Nothing Then copyrng.Copy
+    
+    'Application.ScreenUpdating = True
+    Application.OnTime [Now()+0.01/86400], "'InsertSelectedRowsBelow2 """ & rng.Address & """'"
+    
+End Sub
+
+Sub InsertSelectedRowsBelow2(rngaddress)
+    
+    Range(rngaddress).Select
     Application.ScreenUpdating = True
     
 End Sub
@@ -166,16 +206,17 @@ Sub ToggleReadOnly()
 End Sub
 
 Sub NextSheet()
-
+    
     If ActiveSheet.Index <> Worksheets.Count Then
         ActiveSheet.Next.Activate
     Else
         Worksheets(1).Activate
     End If
+    
 End Sub
 
 Sub PreviousSheet()
-
+    
     If ActiveSheet.Index <> 1 Then
         ActiveSheet.Previous.Activate
     Else
@@ -185,7 +226,7 @@ Sub PreviousSheet()
 End Sub
 
 Sub IndentUp()
-
+    
     If TypeName(Selection) <> "Range" Then Exit Sub
     Selection.InsertIndent insertamount:=1 'Alt+H+6 は遅すぎて使い物にならないため
     
@@ -204,7 +245,7 @@ Sub IndentDown()
 End Sub
 
 Sub HideDones() 'Application.OnTimeを呼ぶところで画面更新がかかってしまう
-
+    
     Application.ScreenUpdating = False
     Application.Calculation = xlCalculationManual
     Set rng = ActiveCell
@@ -219,31 +260,31 @@ Sub HideDones() 'Application.OnTimeを呼ぶところで画面更新がかかっ
                 Set rng2 = Rows(i)
             End If
         End If
-
+    
     Next
     rng2.Select
     makeKeyEvent "^9"
-
+    
     Application.OnTime [Now()+0.01/86400], "'HideDones2 """ & rng.Address & """'"
+    
 End Sub
 
 Sub HideDones2(rngaddress)
-
+    
     Range(rngaddress).Select
     Application.Calculation = xlCalculationAutomatic
     Application.ScreenUpdating = True
-
+    
 End Sub
 
 Sub ShowTitles()
-
+    
     Application.ScreenUpdating = False
     Application.Calculation = xlCalculationManual
     Set rng = ActiveCell
     Set rng2 = Nothing
     For i = Cells(Rows.Count, "B").End(xlUp).Row To 3 Step -1
-
-
+    
         If Left(Cells(i, "B"), 1) = "■" Then
             'Rows(i).Hidden = False
             If Not (rng2 Is Nothing) Then
@@ -252,13 +293,13 @@ Sub ShowTitles()
                 Set rng2 = Rows(i)
             End If
         End If
-
+    
     Next
     rng2.Select
     makeKeyEvent "^+9"
-
+    
     Application.OnTime [Now()+0.01/86400], "'ShowTitles2 """ & rng.Address & """'"
-
+    
 End Sub
 
 Sub ShowTitles2(rngaddress)
